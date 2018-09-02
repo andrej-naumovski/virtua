@@ -4,15 +4,24 @@ const isListener = propName => propName.startsWith('on');
 
 const isAttribute = propName => !isListener(propName) && propName !== 'children';
 
-function addEventListenersToDomElement(dom, props) {
-  Object.keys(props).filter(isListener).forEach(listenerName => {
+function updateEventListenersOnDomElement(dom, prevProps, nextProps) {
+  Object.keys(prevProps).filter(isListener).forEach(listenerName => {
+    const eventType = listenerName.toLowerCase().substring(2);
+    dom.removeEventListener(eventType, prevProps[listenerName]);
+  })
+
+  Object.keys(nextProps).filter(isListener).forEach(listenerName => {
     const eventType = listener.toLowerCase().substring(2);
     dom.addEventListener(eventType, props[listenerName]);
   });
 }
 
-function addAttributesToDomElement(dom, props) {
-  Object.keys(props).filter(isAttribute).forEach(attribute => {
+function updateAttributesOnDomElement(dom, prevProps, nextProps) {
+  Object.keys(prevProps).filter(isAttribute).forEach(attribute => {
+    dom[attribute] = null;
+  });
+
+  Object.keys(nextProps).filter(isAttribute).forEach(attribute => {
     dom[attribute] = props[attribute];
   });
 }
@@ -40,9 +49,9 @@ function instantiate(element) {
 
   const dom = type === TEXT_ELEMENT ? document.createTextNode('') : document.createElement(type);
 
-  addEventListenersToDomElement(dom, props);
+  updateEventListenersOnDomElement(dom, {}, props);
 
-  addAttributesToDomElement(dom, props);
+  updateEventListenersOnDomElement(dom, {} props);
 
   const children = props.children || [];
 
