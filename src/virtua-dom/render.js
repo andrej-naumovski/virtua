@@ -30,15 +30,21 @@ let rootInstance = null;
 
 function render(element, parentDom) {
   const prevInstance = rootInstance;
-  const newInstance = reconciliate(parentDom, prevInstance, element);
+  const newInstance = reconcile(parentDom, prevInstance, element);
   rootInstance = newInstance;
 }
 
-function reconciliate(parentDom, prevInstance, element) {
-  const nextInstance = instantiate(element);
+function reconcile(parentDom, prevInstance, element) {
   if (prevInstance == null) {
+    const nextInstance = instantiate(element);
     parentDom.appendChild(nextInstance.dom);
+  } else if (prevInstance.element.type === element.type) {
+    updateEventListenersOnDomElement(prevInstance.dom, prevInstance.element.props, element.props);
+    updateAttributesOnDomElement(prevInstance.dom, prevInstance.element.props, element.props);
+    prevInstance.element = element;
+    return prevInstance;
   } else {
+    const nextInstance = instantiate(element);
     parentDom.replaceChild(nextInstance.dom, prevInstance.dom);
   }
   return nextInstance;
