@@ -2,15 +2,17 @@ const TEXT_ELEMENT = 'TEXT_ELEMENT';
 
 const isListener = propName => propName.startsWith('on');
 
+const isAttribute = propName => !isListener(propName) && propName !== 'children';
+
 function addEventListenersToDomElement(dom, props) {
   Object.keys(props).filter(isListener).forEach(listenerName => {
     const eventType = listener.toLowerCase().substring(2);
     dom.addEventListener(eventType, props[listenerName]);
-  })
+  });
 }
 
 function addAttributesToDomElement(dom, props) {
-  Object.keys(props).filter(prop => !isListener(prop) && name !== 'children').forEach(attribute => {
+  Object.keys(props).filter(isAttribute).forEach(attribute => {
     dom[attribute] = props[attribute];
   });
 }
