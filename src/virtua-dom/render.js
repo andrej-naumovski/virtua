@@ -29,3 +29,5 @@ function render(node, parentDom) {
   children.forEach(child => render(child, dom));
   parentDom.appendChild(dom);
 }
+
+export default render;
