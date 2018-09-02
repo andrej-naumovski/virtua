@@ -17,8 +17,26 @@ function addAttributesToDomElement(dom, props) {
   });
 }
 
-function render(node, parentDom) {
-  const { type, props } = node;
+let rootInstance = null;
+
+function render(element, parentDom) {
+  const prevInstance = rootInstance;
+  const newInstance = reconciliate(parentDom, prevInstance, element);
+  rootInstance = newInstance;
+}
+
+function reconciliate(parentDom, prevInstance, element) {
+  const nextInstance = instantiate(element);
+  if (prevInstance == null) {
+    parentDom.appendChild(nextInstance.dom);
+  } else {
+    parentDom.replaceChild(nextInstance.dom, prevInstance.dom);
+  }
+  return nextInstance;
+}
+
+function instantiate(element) {
+  const { type, props } = element;
 
   const dom = type === TEXT_ELEMENT ? document.createTextNode('') : document.createElement(type);
 
@@ -28,8 +46,12 @@ function render(node, parentDom) {
 
   const children = props.children || [];
 
-  children.forEach(child => render(child, dom));
-  parentDom.appendChild(dom);
+  const childInstances = children.map(instantiate);
+  const childDoms = childInstances.map(childInstance => childInstance.dom);
+
+  childDoms.forEach(childDom => dom.appendChild(childDom));
+
+  return { dom, element, childInstances };
 }
 
 export default render;
