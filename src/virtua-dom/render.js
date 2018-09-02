@@ -1,4 +1,4 @@
-const TEXT_ELEMENT = 'TEXT_ELEMENT';
+import { TEXT_ELEMENT } from '../constants';
 
 const isListener = propName => propName.startsWith('on');
 
