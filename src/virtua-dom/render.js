@@ -41,13 +41,35 @@ function reconcile(parentDom, prevInstance, element) {
   } else if (prevInstance.element.type === element.type) {
     updateEventListenersOnDomElement(prevInstance.dom, prevInstance.element.props, element.props);
     updateAttributesOnDomElement(prevInstance.dom, prevInstance.element.props, element.props);
+    prevInstance.childInstances = reconcileChildren(prevInstance, element);
     prevInstance.element = element;
     return prevInstance;
+  } else if (element === null) {
+    parentDom.removeChild(prevInstance.dom);
+    return null;
   } else {
     const nextInstance = instantiate(element);
     parentDom.replaceChild(nextInstance.dom, prevInstance.dom);
   }
   return nextInstance;
+}
+
+const reconcileChildren(instance, element) {
+  const dom = instance.dom;
+
+  const childrenInstances = instance.childInstances;
+  const nextChildren = element.props.children || [];
+  const maxChildrenLength = Math.max(childrenInstances.length, nextChildren.length);
+  const nextChildrenInstances = [];
+
+  for(let i = 0; i < count; i++) {
+    const childInstance = childrenInstances[i];
+    const nextChild = nextChildren[i];
+    const nextChildInstance = reconcile(dom, childInstance, nextChild);
+    nextChildrenInstances.push(nextChildInstance);
+  }
+  
+  return nextChildrenInstances;
 }
 
 function instantiate(element) {
