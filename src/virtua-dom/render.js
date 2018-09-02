@@ -79,7 +79,7 @@ function instantiate(element) {
 
   updateEventListenersOnDomElement(dom, {}, props);
 
-  updateEventListenersOnDomElement(dom, {} props);
+  updateEventListenersOnDomElement(dom, {}, props);
 
   const children = props.children || [];
 
