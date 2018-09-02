@@ -1,0 +1,10 @@
+{
+  "name": "virtua",
+  "version": "1.0.0",
+  "description": "A minimal UI library based on React to demonstrate the Virtual DOM, React's reconciliation algorithm and React Fiber.",
+  "main": "index.js",
+  "repository": "https://github.com/andrej-naumovski/virtua.git",
+  "author": "Andrej Naumovski <a.naumovski996@yahoo.com>",
+  "license": "MIT",
+  "private": false
+}
