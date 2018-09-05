@@ -34,7 +34,7 @@ function render(element, parentDom) {
   rootInstance = newInstance;
 }
 
-function reconcile(parentDom, prevInstance, element) {
+export function reconcile(parentDom, prevInstance, element) {
   if (prevInstance == null) {
     const nextInstance = instantiate(element);
     parentDom.appendChild(nextInstance.dom);
@@ -54,7 +54,7 @@ function reconcile(parentDom, prevInstance, element) {
   return nextInstance;
 }
 
-const reconcileChildren(instance, element) {
+function reconcileChildren(instance, element) {
   const dom = instance.dom;
 
   const childrenInstances = instance.childInstances;
@@ -75,20 +75,39 @@ const reconcileChildren(instance, element) {
 function instantiate(element) {
   const { type, props } = element;
 
-  const dom = type === TEXT_ELEMENT ? document.createTextNode('') : document.createElement(type);
+  const isDomElement = typeof type === 'string';
 
-  updateEventListenersOnDomElement(dom, {}, props);
+  if (isDomElement) {
+    const dom = type === TEXT_ELEMENT ? document.createTextNode('') : document.createElement(type);
 
-  updateEventListenersOnDomElement(dom, {}, props);
+    updateEventListenersOnDomElement(dom, {}, props);
 
-  const children = props.children || [];
+    updateEventListenersOnDomElement(dom, {}, props);
 
-  const childInstances = children.map(instantiate);
-  const childDoms = childInstances.map(childInstance => childInstance.dom);
+    const children = props.children || [];
 
-  childDoms.forEach(childDom => dom.appendChild(childDom));
+    const childInstances = children.map(instantiate);
+    const childDoms = childInstances.map(childInstance => childInstance.dom);
 
-  return { dom, element, childInstances };
+    childDoms.forEach(childDom => dom.appendChild(childDom));
+
+    return { dom, element, childInstances };
+  } else {
+    const instance = {};
+    const publicInstance = createPublicInstance(element, instance);
+    const childElement = publicInstance.render();
+    const childInstance = instantiate(childElement);
+    const dom = childInstance.dom;
+
+    return { ...instance, element, childInstance, publicInstance };
+  }
 }
+
+export function createPublicInstance(element, internalInstance) {
+  const { type, props } = element;
+  const publicInstance = new type(props);
+  publicInstance.__internalInstance = internalInstance;
+  return publicInstance;
+} 
 
 export default render;
