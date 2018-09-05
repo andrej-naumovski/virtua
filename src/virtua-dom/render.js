@@ -38,7 +38,12 @@ export function reconcile(parentDom, prevInstance, element) {
   if (prevInstance == null) {
     const nextInstance = instantiate(element);
     parentDom.appendChild(nextInstance.dom);
-  } else if (prevInstance.element.type === element.type) {
+    return nextInstance;
+  } else if (prevInstance.element.type == element.type) {
+    const nextInstance = instantiate(element);
+    parentDom.replaceChild(nextInstance.dom, prevInstance.dom);
+    return nextInstance;
+  } else if (typeof element.type === 'string') {
     updateEventListenersOnDomElement(prevInstance.dom, prevInstance.element.props, element.props);
     updateAttributesOnDomElement(prevInstance.dom, prevInstance.element.props, element.props);
     prevInstance.childInstances = reconcileChildren(prevInstance, element);
@@ -48,10 +53,15 @@ export function reconcile(parentDom, prevInstance, element) {
     parentDom.removeChild(prevInstance.dom);
     return null;
   } else {
-    const nextInstance = instantiate(element);
-    parentDom.replaceChild(nextInstance.dom, prevInstance.dom);
+    prevInstance.publicInstance.props = element.props;
+    const childElement = prevInstance.publicInstance.render();
+    const oldChildInstance = prevInstance.childInstance;
+    const nextChildInstance = reconcile(prevInstance.dom, oldChildInstance, childElement);
+    prevInstance.dom = nextChildInstance.dom;
+    prevInstance.childInstance = nextChildInstance;
+    prevInstance.element = element;
+    return prevInstance;
   }
-  return nextInstance;
 }
 
 function reconcileChildren(instance, element) {
